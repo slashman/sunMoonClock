@@ -1,0 +1,40 @@
+.smc_container {
+	width: 384px;
+	height: 288px;
+	position: relative;
+	mask-image:url(mask.png);
+	mask-type: alpha;
+	-webkit-mask-image:url(mask.png);
+	-webkit-mask-type: alpha;
+	overflow: hidden;
+}
+
+.smc_backgrounds {
+	background-image: url(backgrounds.png);
+	position: absolute;
+	top: 48px;
+	left: 48px;
+	width: 288px;
+	height: 192px;
+}
+
+.smc_stars {
+	position: absolute;
+	top: 48px;
+	left: 48px;
+	width: 288px;
+	height: 192px;
+}
+
+.smc_minstrel {
+	background-image: url(minstrel_play.png);
+	position: absolute;
+	top: 81px;
+	left: 144px;
+	width: 96px;
+	height: 144px;
+}
+
+.smc_sprite {
+	position: absolute;
+}
