@@ -14,11 +14,8 @@ android {
 		versionCode = 1
 		versionName = "0.1"
 
-		// Hardcoded URL the widget fetches. Change for your deployment.
-		// 10.0.2.2 reaches the host machine from the Android emulator,
-		// so the renderer running on http://localhost:3000 is reachable
-		// at http://10.0.2.2:3000 from inside the emulator.
-		buildConfigField("String", "CLOCK_URL", "\"http://10.0.2.2:3000/current\"")
+		// URL the widget fetches the clock PNG from. Hardcoded per deployment.
+		buildConfigField("String", "CLOCK_URL", "\"https://slashie.net/time/current\"")
 	}
 
 	buildFeatures {
