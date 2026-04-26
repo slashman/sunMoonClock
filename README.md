@@ -1,8 +1,14 @@
 # sunMoonClock
 
-A visual clock showing the sun and moon across the sky, in four flavors. Live web demo: https://slashie.net/time
+A visual clock showing the sun and moon across the sky, in five flavors. Live web demo: https://slashie.net/time
 
-This repository holds four sibling projects:
+This repository holds five sibling projects. The data flow:
+
+```
+web/  →  renderer/  →  proxy/  →  ios/, android/
+clock    Node screenshot   PHP cache at      home-screen
+source   server (private)  /time/current     widgets
+```
 
 ## [`web/`](./web) — the original web-embeddable clock
 
@@ -10,15 +16,19 @@ Vanilla HTML/JS/CSS, no build step. Renders the live animated clock and is the c
 
 ## [`renderer/`](./renderer) — Node.js screenshot server
 
-Playwright-backed HTTP server. `GET /current` returns a transparent PNG of the clock, lazily re-rendering at most once per calendar minute. Configure the upstream clock URL via `SMC_URL`.
+Playwright-backed HTTP server. `GET /current` returns a transparent PNG of the clock, lazily re-rendering at most once per calendar minute. Runs privately; not exposed directly to widgets. Configure the upstream clock URL via `SMC_URL`.
+
+## [`proxy/`](./proxy) — PHP reverse-proxy + cache
+
+Single `index.php` you drop onto the same shared host that serves the web clock. Fetches from the renderer once per minute, caches to disk, and serves stale cache on upstream failure. This is the public URL the widgets hit; configure the upstream renderer URL at the top of the file.
 
 ## [`ios/`](./ios) — iOS home-screen widget (planned)
 
-Fetches the renderer URL and displays it.
+Fetches the proxy URL and displays it.
 
 ## [`android/`](./android) — Android home-screen widget (planned)
 
-Fetches the renderer URL and displays it.
+Fetches the proxy URL and displays it.
 
 ## Credits
 
