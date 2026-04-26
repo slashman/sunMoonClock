@@ -10,11 +10,12 @@ async function getBrowser() {
 	return browserPromise;
 }
 
-export async function renderClock(outputPath, url = 'http://localhost:8000') {
+export async function renderClock(outputPath, url, timezoneId) {
 	const browser = await getBrowser();
 	const context = await browser.newContext({
 		viewport: { width: 480, height: 360 },
 		deviceScaleFactor: 1,
+		timezoneId,
 	});
 	try {
 		const page = await context.newPage();
@@ -51,10 +52,11 @@ export async function shutdown() {
 const isMain = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMain) {
 	const url = process.env.SMC_URL ?? 'http://localhost:8000';
+	const tz = process.env.SMC_TZ ?? 'UTC';
 	const output = process.argv[2] ?? 'current.png';
 	try {
-		await renderClock(output, url);
-		console.log(`Wrote ${output}`);
+		await renderClock(output, url, tz);
+		console.log(`Wrote ${output} (tz=${tz})`);
 	} finally {
 		await shutdown();
 	}

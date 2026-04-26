@@ -1,13 +1,23 @@
 <?php
-// Reverse-proxy / per-minute cache for the sun-moon clock PNG.
+// Reverse-proxy / per-minute-per-tz cache for the sun-moon clock PNG.
 // Drop this index.php into a directory on the shared host that serves the
 // clock; the directory's public URL becomes the endpoint the widgets hit.
 // Set UPSTREAM_URL to the public URL of your Node renderer's /current endpoint.
 
 const UPSTREAM_URL      = 'https://smc-renderer.onrender.com/current';
-const CACHE_FILE        = __DIR__ . '/current.png';
+const CACHE_DIR         = __DIR__ . '/cache';
 const TIMEOUT_SECONDS   = 8;
 const CONNECT_TIMEOUT_S = 4;
+const TZ_RE             = '#^[A-Za-z][A-Za-z0-9+_-]*(/[A-Za-z0-9+_-]+)*$#';
+
+function validate_tz(?string $raw): ?string {
+	if ($raw === null || $raw === '') return 'UTC';
+	return preg_match(TZ_RE, $raw) ? $raw : null;
+}
+
+function cache_path(string $tz): string {
+	return CACHE_DIR . '/' . str_replace('/', '~', $tz) . '.png';
+}
 
 function fresh_for_current_minute(string $path): bool {
 	if (!is_file($path)) return false;
@@ -15,7 +25,8 @@ function fresh_for_current_minute(string $path): bool {
 	return $mtime !== false && intdiv($mtime, 60) === intdiv(time(), 60);
 }
 
-function fetch_upstream(string $url): ?string {
+function fetch_upstream(string $tz): ?string {
+	$url = UPSTREAM_URL . '?tz=' . rawurlencode($tz);
 	$ch = curl_init($url);
 	curl_setopt_array($ch, [
 		CURLOPT_RETURNTRANSFER => true,
@@ -42,21 +53,31 @@ function serve(string $path): void {
 	readfile($path);
 }
 
-if (fresh_for_current_minute(CACHE_FILE)) {
-	serve(CACHE_FILE);
+$tz = validate_tz($_GET['tz'] ?? null);
+if ($tz === null) {
+	http_response_code(400);
+	header('Content-Type: text/plain');
+	echo "invalid tz\n";
 	exit;
 }
 
-$body = fetch_upstream(UPSTREAM_URL);
+if (!is_dir(CACHE_DIR)) @mkdir(CACHE_DIR, 0755, true);
+$cache = cache_path($tz);
+
+if (fresh_for_current_minute($cache)) {
+	serve($cache);
+	exit;
+}
+
+$body = fetch_upstream($tz);
 if ($body !== null) {
-	write_atomic(CACHE_FILE, $body);
-	serve(CACHE_FILE);
+	write_atomic($cache, $body);
+	serve($cache);
 	exit;
 }
 
-// Upstream failed — fall back to stale cache if any
-if (is_file(CACHE_FILE)) {
-	serve(CACHE_FILE);
+if (is_file($cache)) {
+	serve($cache);
 	exit;
 }
 

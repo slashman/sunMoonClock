@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
+import java.util.TimeZone
 
 private const val TAG = "RefreshWorker"
 
@@ -25,13 +27,14 @@ class RefreshWorker(
 		val mgr = AppWidgetManager.getInstance(applicationContext)
 		val component = ComponentName(applicationContext, ClockWidgetProvider::class.java)
 		val widgetIds = mgr.getAppWidgetIds(component)
-		Log.d(TAG, "doWork: widgetIds=${widgetIds.size} url=${BuildConfig.CLOCK_URL}")
+		val url = buildUrl(BuildConfig.CLOCK_URL, TimeZone.getDefault().id)
+		Log.d(TAG, "doWork: widgetIds=${widgetIds.size} url=$url")
 		if (widgetIds.isEmpty()) return@withContext Result.success()
 
 		val bitmap = try {
-			fetchBitmap(BuildConfig.CLOCK_URL)
+			fetchBitmap(url)
 		} catch (e: Exception) {
-			Log.e(TAG, "fetch failed for ${BuildConfig.CLOCK_URL}", e)
+			Log.e(TAG, "fetch failed for $url", e)
 			return@withContext Result.retry()
 		}
 
@@ -42,6 +45,11 @@ class RefreshWorker(
 			mgr.updateAppWidget(id, views)
 		}
 		Result.success()
+	}
+
+	private fun buildUrl(base: String, tz: String): String {
+		val sep = if (base.contains('?')) '&' else '?'
+		return base + sep + "tz=" + URLEncoder.encode(tz, "UTF-8")
 	}
 
 	private fun fetchBitmap(url: String): Bitmap {

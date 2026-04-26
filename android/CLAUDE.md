@@ -24,3 +24,5 @@ Three independent triggers update the widget. The `updatePeriodMillis` in `res/x
 - `ScreenOnReceiver` listens for `ACTION_USER_PRESENT` (registered in `ClockApp.onCreate` as `RECEIVER_NOT_EXPORTED`) and triggers the same one-shot refresh when the user unlocks. This is the main reason the widget appears "live" — periodic work alone updates only every 15 minutes.
 
 `RefreshWorker` does a blocking `HttpURLConnection` fetch on `Dispatchers.IO`, decodes to a `Bitmap`, and pushes it into the widget via `RemoteViews.setImageViewBitmap`. On failure it returns `Result.retry()` (WorkManager backs off). It does no client-side caching — the proxy is authoritative.
+
+The fetch URL is built per-request as `CLOCK_URL?tz=<TimeZone.getDefault().id>`, so the rendered scene reflects the device's current tz and follows the user across timezones automatically. The proxy and renderer key their caches by this tz; see the root `CLAUDE.md` for the cross-layer protocol.

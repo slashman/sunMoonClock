@@ -10,8 +10,9 @@ No build, no dependencies beyond curl. Edit the `UPSTREAM_URL` constant at the t
 
 ## Internals
 
-- Caches to `current.png` next to the script via `write_atomic` (write to `.tmp.<pid>` then rename).
-- On upstream failure, falls through to serving the stale cache rather than 5xx-ing. Only returns 503 when no cache file exists at all.
+- Per-tz cache files in `cache/` next to the script, written via `write_atomic` (write to `.tmp.<pid>` then rename). The directory is created on first request.
+- Reads `?tz=` from the request, validates it against the same regex the renderer uses, and forwards it to the upstream as `?tz=<urlencoded>`. Missing `tz` falls back to `UTC` for backward compat with widgets that predate the per-tz protocol.
+- On upstream failure, falls through to serving the stale per-tz cache rather than 5xx-ing. Only returns 503 when no cache file for that tz exists at all (so a brand-new tz on a dead renderer 503s, but a familiar tz keeps serving stale).
 - `TIMEOUT_SECONDS = 8`, `CONNECT_TIMEOUT_S = 4` — tuned so the widget's own ~12s read timeout still has headroom if this layer has to wait on the renderer cold-starting.
 
-The per-minute freshness check is the same invariant enforced by the renderer; see the root `CLAUDE.md`.
+The per-minute, per-tz caching invariant is the same one enforced by the renderer; see the root `CLAUDE.md`.
