@@ -10,7 +10,7 @@ async function getBrowser() {
 	return browserPromise;
 }
 
-export async function renderClock(outputPath, url = 'https://slashie.net/time') {
+export async function renderClock(outputPath, url = 'http://localhost:8000') {
 	const browser = await getBrowser();
 	const context = await browser.newContext({
 		viewport: { width: 480, height: 360 },
@@ -50,7 +50,7 @@ export async function shutdown() {
 
 const isMain = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMain) {
-	const url = process.env.SMC_URL ?? 'https://slashie.net/time';
+	const url = process.env.SMC_URL ?? 'http://localhost:8000';
 	const output = process.argv[2] ?? 'current.png';
 	try {
 		await renderClock(output, url);

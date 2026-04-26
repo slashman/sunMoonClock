@@ -3,7 +3,7 @@ import { stat, readFile } from 'node:fs/promises';
 import { renderClock, shutdown } from './render.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
-const URL_TO_RENDER = process.env.SMC_URL ?? 'https://slashie.net/time';
+const URL_TO_RENDER = process.env.SMC_URL ?? 'http://localhost:8000';
 const OUTPUT_FILE = process.env.SMC_OUTPUT ?? 'current.png';
 
 let inflight = null;

@@ -6,19 +6,19 @@ This repository holds four sibling projects:
 
 ## [`web/`](./web) — the original web-embeddable clock
 
-Vanilla HTML/JS/CSS, no build step. Renders the live animated clock and is the canonical implementation. Embedded at https://slashie.net/time and screenshotted by `renderer/` for use by the mobile widgets.
+Vanilla HTML/JS/CSS, no build step. Renders the live animated clock and is the canonical implementation. Deploy as static files behind any web server.
 
-## [`renderer/`](./renderer) — Node.js screenshot generator (planned)
+## [`renderer/`](./renderer) — Node.js screenshot server
 
-Cron'd Node script that uses Playwright (or similar) to capture https://slashie.net/time and publish the result at https://slashie.net/time/current as a PNG. Source of truth for the image both mobile widgets fetch.
+Playwright-backed HTTP server. `GET /current` returns a transparent PNG of the clock, lazily re-rendering at most once per calendar minute. Configure the upstream clock URL via `SMC_URL`.
 
 ## [`ios/`](./ios) — iOS home-screen widget (planned)
 
-Fetches https://slashie.net/time/current and displays it.
+Fetches the renderer URL and displays it.
 
 ## [`android/`](./android) — Android home-screen widget (planned)
 
-Fetches https://slashie.net/time/current and displays it.
+Fetches the renderer URL and displays it.
 
 ## Credits
 
