@@ -4,7 +4,7 @@
 // clock; the directory's public URL becomes the endpoint the widgets hit.
 // Set UPSTREAM_URL to the public URL of your Node renderer's /current endpoint.
 
-const UPSTREAM_URL      = 'https://your-renderer-host.example/current';
+const UPSTREAM_URL      = 'https://smc-renderer.onrender.com/current';
 const CACHE_FILE        = __DIR__ . '/current.png';
 const TIMEOUT_SECONDS   = 8;
 const CONNECT_TIMEOUT_S = 4;
