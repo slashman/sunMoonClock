@@ -1,4 +1,4 @@
-package net.slashie.sunmoonclock
+package net.slashie.minstrelsclock
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName

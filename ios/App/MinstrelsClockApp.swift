@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct SunMoonClockApp: App {
+struct MinstrelsClockApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()

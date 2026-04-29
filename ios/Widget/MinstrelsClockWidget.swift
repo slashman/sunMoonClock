@@ -2,21 +2,21 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct SunMoonClockWidgetBundle: WidgetBundle {
+struct MinstrelsClockWidgetBundle: WidgetBundle {
 	var body: some Widget {
-		SunMoonClockWidget()
+		MinstrelsClockWidget()
 	}
 }
 
-struct SunMoonClockWidget: Widget {
-	let kind: String = "SunMoonClockWidget"
+struct MinstrelsClockWidget: Widget {
+	let kind: String = "MinstrelsClockWidget"
 
 	var body: some WidgetConfiguration {
 		let config = StaticConfiguration(kind: kind, provider: ClockTimelineProvider()) { entry in
 			ClockWidgetView(entry: entry)
 				.containerBackgroundCompat(SkyColor.backdrop(at: entry.date))
 		}
-		.configurationDisplayName("Sun Moon Clock")
+		.configurationDisplayName("The Minstrel")
 		.description("A live sun and moon clock for your home screen.")
 		.supportedFamilies([.systemMedium])
 

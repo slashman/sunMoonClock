@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-	namespace = "net.slashie.sunmoonclock"
+	namespace = "net.slashie.minstrelsclock"
 	compileSdk = 34
 
 	defaultConfig {
-		applicationId = "net.slashie.sunmoonclock"
+		applicationId = "net.slashie.minstrelsclock"
 		minSdk = 24
 		targetSdk = 34
 		versionCode = 1

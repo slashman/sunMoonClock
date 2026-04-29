@@ -1,4 +1,4 @@
-package net.slashie.sunmoonclock
+package net.slashie.minstrelsclock
 
 import android.content.BroadcastReceiver
 import android.content.Context

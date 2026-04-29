@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 	}
 }
 
-rootProject.name = "SunMoonClock"
+rootProject.name = "MinstrelsClock"
 include(":app")

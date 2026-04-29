@@ -8,8 +8,8 @@ SwiftUI containing app + a WidgetKit extension. The app is a `WKWebView` pointed
 
 ```
 brew install xcodegen          # one-time
-xcodegen generate              # regenerate SunMoonClock.xcodeproj from project.yml
-open SunMoonClock.xcodeproj    # then Cmd-R in Xcode
+xcodegen generate              # regenerate MinstrelsClock.xcodeproj from project.yml
+open MinstrelsClock.xcodeproj    # then Cmd-R in Xcode
 ```
 
 The `.xcodeproj` is gitignored — `project.yml` is the source of truth. Re-run `xcodegen generate` after editing `project.yml`, adding/removing source files, or pulling.
@@ -28,7 +28,7 @@ Modern Xcode supports the single 1024×1024 "Single Size" icon entry, so we don'
 
 ## Refresh model
 
-WidgetKit drives refresh; we do not. `Widget/SunMoonClockWidget.swift::ClockTimelineProvider`:
+WidgetKit drives refresh; we do not. `Widget/MinstrelsClockWidget.swift::ClockTimelineProvider`:
 
 - `getTimeline` fetches `CLOCK_URL?tz=<TimeZone.current.identifier>` via `URLSession`, returns one entry, and asks the system to reload `.after(now + 60s)` on success or `+ 120s` on failure.
 - iOS will throttle further than that — WidgetKit budgets timeline reloads system-wide and there is no equivalent of Android's `ACTION_USER_PRESENT` to force a refresh on unlock. Expect minute-accurate updates only when the user is actively interacting with the home screen.
@@ -38,7 +38,7 @@ The PNG bytes (≈10–30 KB at 480×360) ride on the `TimelineEntry` directly �
 
 ## Widget rendering
 
-`SunMoonClockWidget` advertises only `.systemMedium` because the renderer's 480×360 (4:3) output fits that family with the least letterboxing. Adding `.systemSmall` would require a square render variant from the renderer (e.g. `?size=square`) — out of scope for now.
+`MinstrelsClockWidget` advertises only `.systemMedium` because the renderer's 480×360 (4:3) output fits that family with the least letterboxing. Adding `.systemSmall` would require a square render variant from the renderer (e.g. `?size=square`) — out of scope for now.
 
 `Image(uiImage:).interpolation(.none)` keeps the pixel art crisp when the widget scales the PNG to the cell. The iOS 17+ `.containerBackground` requirement is handled via `containerBackgroundCompat` — falls back to `.background()` on iOS 16.
 
