@@ -1,0 +1,4 @@
+// URL the widget fetches the clock PNG from. Hardcoded per deployment.
+// The double-slash in https:// would otherwise start an xcconfig comment;
+// $() is an empty variable reference that splits the literal harmlessly.
+CLOCK_URL = https:/$()/slashie.net/time/current
