@@ -75,9 +75,22 @@ struct ClockTimelineProvider: TimelineProvider {
 struct ClockWidgetView: View {
 	let entry: ClockEntry
 
+	// The renderer outputs 384x288 PNGs whose visible content (arch + scene)
+	// sits within rows 24..242. Cropping out the transparent border lets the
+	// widget cell host the art at a near-2:1 aspect with less empty sky-blue
+	// padding. If the renderer's container height or mask changes, update.
+	private static let contentTopInset: CGFloat = 24
+	private static let contentBottomInset: CGFloat = 0
+
 	var body: some View {
-		if let data = entry.imageData, let image = UIImage(data: data) {
-			Image(uiImage: image)
+		if let data = entry.imageData,
+		   let cgImage = UIImage(data: data)?.cgImage,
+		   let cropped = cgImage.cropping(to: CGRect(
+			   x: 0,
+			   y: Self.contentTopInset,
+			   width: CGFloat(cgImage.width),
+			   height: CGFloat(cgImage.height) - Self.contentTopInset - Self.contentBottomInset)) {
+			Image(decorative: cropped, scale: 1, orientation: .up)
 				.resizable()
 				.interpolation(.none)
 				.aspectRatio(contentMode: .fit)
