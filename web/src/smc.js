@@ -126,7 +126,8 @@ window.smc = {
 
 		// Initialize control variables
 		this.currentMinstrelFrame = 0;
-		this.cloudPositionX = -1000;
+		this.cloudPositionX = -200 + Math.random() * (390 - (-200));
+		this.cloudPositionY = 64 + Math.floor(Math.random() * (100 - 64));
 
 		// Setup ticks
 		setInterval(() => this.secondsTick(), 1000);
