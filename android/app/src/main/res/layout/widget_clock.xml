@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/widget_root"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
@@ -10,4 +11,15 @@
 		android:adjustViewBounds="true"
 		android:scaleType="fitCenter"
 		android:contentDescription="@string/widget_description" />
+
+	<TextView
+		android:id="@+id/clock_error"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="center"
+		android:padding="12dp"
+		android:textColor="@android:color/white"
+		android:textSize="14sp"
+		android:text="@string/widget_unavailable"
+		android:visibility="gone" />
 </FrameLayout>

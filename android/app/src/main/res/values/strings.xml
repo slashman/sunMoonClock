@@ -2,4 +2,5 @@
 <resources>
 	<string name="app_name">The Minstrel</string>
 	<string name="widget_description">The Minstrel</string>
+	<string name="widget_unavailable">Couldn\'t reach the minstrel</string>
 </resources>

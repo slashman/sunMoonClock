@@ -80,7 +80,7 @@ class ClockWidgetProvider : AppWidgetProvider() {
 				intent,
 				PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
 			)
-			views.setOnClickPendingIntent(R.id.clock_image, pending)
+			views.setOnClickPendingIntent(R.id.widget_root, pending)
 		}
 	}
 }

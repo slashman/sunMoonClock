@@ -33,29 +33,34 @@ struct MinstrelsClockWidget: Widget {
 struct ClockEntry: TimelineEntry {
 	let date: Date
 	let imageData: Data?
+	let isPlaceholder: Bool
 }
 
 struct ClockTimelineProvider: TimelineProvider {
 	func placeholder(in context: Context) -> ClockEntry {
-		ClockEntry(date: Date(), imageData: nil)
+		ClockEntry(date: Date(), imageData: nil, isPlaceholder: true)
 	}
 
 	func getSnapshot(in context: Context, completion: @escaping (ClockEntry) -> Void) {
 		Task {
-			let data = try? await fetchClockImage()
-			completion(ClockEntry(date: Date(), imageData: data))
+			let data = (try? await fetchClockImage()) ?? loadCachedImage()
+			completion(ClockEntry(date: Date(), imageData: data, isPlaceholder: false))
 		}
 	}
 
 	func getTimeline(in context: Context, completion: @escaping (Timeline<ClockEntry>) -> Void) {
 		Task {
 			let now = Date()
-			let data = try? await fetchClockImage()
+			let fresh = try? await fetchClockImage()
+			if let fresh = fresh { saveCachedImage(fresh) }
+			// On failure, fall back to the last good PNG from disk so transient blips
+			// keep the clock visible. The error view only renders when there is no
+			// cache yet — i.e. first install while offline.
+			let data = fresh ?? loadCachedImage()
 			// Success: ask for the next reload at the top of the next minute. iOS will
-			// throttle further but this is the right ask. Failure: retry in 2 minutes
-			// and keep showing whatever the system has cached from the prior entry.
-			let nextReload = Calendar.current.date(byAdding: .second, value: data == nil ? 120 : 60, to: now) ?? now.addingTimeInterval(60)
-			let entry = ClockEntry(date: now, imageData: data)
+			// throttle further but this is the right ask. Failure: retry in 2 minutes.
+			let nextReload = Calendar.current.date(byAdding: .second, value: fresh == nil ? 120 : 60, to: now) ?? now.addingTimeInterval(60)
+			let entry = ClockEntry(date: now, imageData: data, isPlaceholder: false)
 			completion(Timeline(entries: [entry], policy: .after(nextReload)))
 		}
 	}
@@ -69,6 +74,20 @@ struct ClockTimelineProvider: TimelineProvider {
 			throw URLError(.badServerResponse)
 		}
 		return data
+	}
+
+	private func cachedImageURL() -> URL? {
+		FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent("last-clock.png")
+	}
+
+	private func saveCachedImage(_ data: Data) {
+		guard let url = cachedImageURL() else { return }
+		try? data.write(to: url, options: .atomic)
+	}
+
+	private func loadCachedImage() -> Data? {
+		guard let url = cachedImageURL() else { return nil }
+		return try? Data(contentsOf: url)
 	}
 }
 
@@ -95,8 +114,14 @@ struct ClockWidgetView: View {
 				.interpolation(.none)
 				.aspectRatio(contentMode: .fit)
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-		} else {
+		} else if entry.isPlaceholder {
 			ProgressView()
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+		} else {
+			Text("Couldn’t reach the minstrel")
+				.foregroundColor(.white)
+				.multilineTextAlignment(.center)
+				.padding()
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 		}
 	}
