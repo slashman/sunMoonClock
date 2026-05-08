@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Kotlin AppWidget that fetches the proxy URL on a schedule and pushes the PNG into the home-screen widget. Single-module Gradle project, no Compose.
+Kotlin app + AppWidget. The app is a `WebView` pointed at `https://slashie.net/tmc`; the widget fetches the proxy URL on a schedule and pushes the PNG into the home-screen widget. Tapping the widget launches the app. Single-module Gradle project, no Compose.
 
 ## Commands
 
@@ -26,3 +26,11 @@ Three independent triggers update the widget. The `updatePeriodMillis` in `res/x
 `RefreshWorker` does a blocking `HttpURLConnection` fetch on `Dispatchers.IO`, decodes to a `Bitmap`, and pushes it into the widget via `RemoteViews.setImageViewBitmap`. On failure it returns `Result.retry()` (WorkManager backs off). It does no client-side caching — the proxy is authoritative.
 
 The fetch URL is built per-request as `CLOCK_URL?tz=<TimeZone.getDefault().id>`, so the rendered scene reflects the device's current tz and follows the user across timezones automatically. The proxy and renderer key their caches by this tz; see the root `CLAUDE.md` for the cross-layer protocol.
+
+## Widget tap → app launch
+
+Both `ClockWidgetProvider.onUpdate` and `RefreshWorker.doWork` build a fresh `RemoteViews` and call `updateAppWidget`, which replaces the previous RemoteViews wholesale. That means the click `PendingIntent` must be re-attached on every update, not just at provider boot. `ClockWidgetProvider.applyLaunchIntent` is the single source of truth and is called from both sites; if you add a third path that updates the widget's RemoteViews, call it there too or the tap-to-launch will go dead after the next refresh.
+
+## App (`MainActivity`)
+
+`MainActivity` is a plain `Activity` (no AppCompat) hosting a `WebView`. The page URL is hardcoded in `MainActivity.PAGE_URL` — distinct from `BuildConfig.CLOCK_URL`, which is the widget's PNG endpoint. WebView state is saved/restored across config changes via `saveState`/`restoreState`, and back-press walks the WebView history before exiting.

@@ -42,6 +42,7 @@ class RefreshWorker(
 		widgetIds.forEach { id ->
 			val views = RemoteViews(applicationContext.packageName, R.layout.widget_clock)
 			views.setImageViewBitmap(R.id.clock_image, bitmap)
+			ClockWidgetProvider.applyLaunchIntent(applicationContext, views)
 			mgr.updateAppWidget(id, views)
 		}
 		Result.success()
