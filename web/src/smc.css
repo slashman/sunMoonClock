@@ -35,6 +35,13 @@
 	height: 144px;
 }
 
+.smc_moon {
+	background-image: url(moon_phases.png);
+	position: absolute;
+	width: 48px;
+	height: 48px;
+}
+
 .smc_sprite {
 	position: absolute;
 }

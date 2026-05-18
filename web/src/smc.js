@@ -5,6 +5,13 @@ const frameOffsetX = 48;
 const frameOffsetY = 84;
 const backgroundsTileWidth = 288;
 const minstrelTileWidth = 96;
+const moonTileSize = 48;
+const moonPhaseCount = 10;
+// Reference new moon in UTC; combined with the synodic period this picks the
+// tile in moon_phases.png. Tile 0 is full and tile 5 is new, so the +5 below
+// rotates a phase fraction (0 = new) into the image's indexing.
+const moonReferenceNewMoonMs = Date.UTC(2000, 0, 6, 18, 14);
+const synodicMonthMs = 29.530588 * 86400 * 1000;
 
 // From http://www.krazydad.com/makecolors.php
 function RGB2Color(r, g, b) {
@@ -91,7 +98,7 @@ window.smc = {
 		
 		// Create elements
 		this.sunImg = document.createElement("img");
-		this.moonImg = document.createElement("img");
+		this.moonImg = document.createElement("div");
 		this.cloudImg = document.createElement("img");
 		this.frameImg = document.createElement("img");
 		this.starsImg = document.createElement("img");
@@ -101,7 +108,7 @@ window.smc = {
 		// Add classes
 		this.anchorElement.classList.add('smc_container');
 		this.sunImg.classList.add('smc_sprite');
-		this.moonImg.classList.add('smc_sprite');
+		this.moonImg.classList.add('smc_moon');
 		this.cloudImg.classList.add('smc_sprite');
 		this.frameImg.classList.add('smc_sprite');
 		this.backgroundsDiv.classList.add('smc_backgrounds');
@@ -110,7 +117,6 @@ window.smc = {
 
 		// Set image sources
 		this.sunImg.src = "sun.png";
-		this.moonImg.src = "moon.png";
 		this.frameImg.src = "frame.png";
 		this.cloudImg.src = "cloud.png";
 		this.starsImg.src = "stars.png";
@@ -146,6 +152,7 @@ window.smc = {
 	},
 	secondsTick () {
 		this.updateCelestialBodies();
+		this.updateMoonPhase();
 		this.updateSkyColor();
 		this.updateLandscape();
 		this.updateStars();
@@ -154,14 +161,22 @@ window.smc = {
 		const hours = this.getCurrentHourOfDay();
 		let sunAngle = (Math.PI * 1.5) -(hours * radiansPerHour);
 		let moonAngle = sunAngle + Math.PI;
-		const moonX = radius + Math.cos(moonAngle) * radius - iconHalfWidth + frameOffsetX;
-		const moonY = radius - Math.sin(moonAngle) * radius - iconHalfWidth + frameOffsetY;
+		const moonHalfTile = moonTileSize / 2;
+		const moonX = radius + Math.cos(moonAngle) * radius - moonHalfTile + frameOffsetX;
+		const moonY = radius - Math.sin(moonAngle) * radius - moonHalfTile + frameOffsetY;
 		this.moonImg.style.top = moonY + "px";
 		this.moonImg.style.left = moonX + "px";
 		const sunX = radius + Math.cos(sunAngle) * radius - iconHalfWidth + frameOffsetX;
 		const sunY = radius - Math.sin(sunAngle) * radius - iconHalfWidth + frameOffsetY;
 		this.sunImg.style.top = sunY + "px";
 		this.sunImg.style.left = sunX + "px";
+	},
+	updateMoonPhase() {
+		const elapsed = Date.now() - moonReferenceNewMoonMs;
+		let phase = (elapsed / synodicMonthMs) % 1;
+		if (phase < 0) phase += 1;
+		const tile = (5 + Math.floor(phase * moonPhaseCount)) % moonPhaseCount;
+		this.moonImg.style.backgroundPositionX = (-tile * moonTileSize) + "px";
 	},
 	updateSkyColor() {
 		const currentHourOfDay = this.getCurrentHourOfDay();
