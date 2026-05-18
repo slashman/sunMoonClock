@@ -1,0 +1,188 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="smc.css">
+		<script src="smc.js"></script>
+		<style>
+			body {
+				background: #000;
+				margin: 0;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			#lyrics {
+				color: #fff;
+				font-family: serif;
+				font-size: 22px;
+				max-width: 360px;
+				text-align: center;
+				padding: 24px 16px;
+				opacity: 0;
+				transition: opacity 3s ease-in-out;
+				pointer-events: none;
+			}
+
+			#lyrics.visible {
+				opacity: 1;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="clockAnchor"></div>
+		<div id="lyrics"></div>
+		<script>
+			smc.init('clockAnchor');
+
+			const encouragements = [
+				"Every great journey once looked impossible.",
+				"A weary traveler still moves forward.",
+				"Even the smallest flame can guide the lost.",
+				"Rest is part of the adventure.",
+				"Fortune favors those who endure.",
+				"The next step matters more than the last stumble.",
+				"No winter lasts forever.",
+				"The stars still shine above the storm.",
+				"A calm mind sharpens every blade.",
+				"Patience is a hidden kind of courage.",
+				"Heroes are built from ordinary days.",
+				"There is strength in continuing.",
+				"The road bends, but it does not end.",
+				"One good day can change a season.",
+				"A slow climb still reaches the summit.",
+				"The dawn arrives whether feared or welcomed.",
+				"Your story is not finished yet.",
+				"The world is brighter with persistence in it.",
+				"Every sunset prepares another sunrise.",
+				"Even legends once doubted themselves.",
+				"Momentum begins with tiny movements.",
+				"Hope is lighter to carry when shared.",
+				"The river reaches the sea by continuing.",
+				"A rested heart sees clearer paths.",
+				"Small victories are still victories.",
+				"There is wisdom in surviving difficult times.",
+				"You have already overcome many storms.",
+				"The future has room for better days.",
+				"A lantern shines brightest in darkness.",
+				"Some paths only appear after patience.",
+				"Kindness is never wasted.",
+				"Time heals quietly and slowly.",
+				"You are allowed to begin again.",
+				"The mountain does not climb itself.",
+				"Steady steps outrun sudden bursts.",
+				"The brave are often simply persistent.",
+				"Not every battle must be fought today.",
+				"Peace can be an achievement too.",
+				"Even silence can restore strength.",
+				"The next chapter may surprise you.",
+				"A determined spirit survives rough roads.",
+				"Every master was once uncertain.",
+				"Your pace is still a pace.",
+				"The moon guides travelers through darkness.",
+				"There are still songs left to sing.",
+				"One moment of courage changes many things.",
+				"The world turns in your favor eventually.",
+				"A patient seed becomes a mighty tree.",
+				"You are closer than yesterday.",
+				"The climb proves your strength.",
+				"Gentle progress is still progress.",
+				"No map shows every treasure.",
+				"A hopeful heart travels farther.",
+				"Some victories arrive quietly.",
+				"Even old roads can lead somewhere new.",
+				"The horizon rewards those who keep walking.",
+				"Tomorrow is another roll of the dice.",
+				"Every ending leaves room for beginnings.",
+				"Storms pass more quickly than they seem.",
+				"The light returns little by little.",
+				"Many paths lead to meaningful places.",
+				"A thoughtful pause is not defeat.",
+				"Your efforts are planting unseen seeds.",
+				"Even cracked shields can protect.",
+				"The journey shapes the traveler.",
+				"The strongest bridges are built slowly.",
+				"An honest attempt carries value.",
+				"The day is not lost yet.",
+				"The heart recovers one beat at a time.",
+				"Courage often arrives quietly.",
+				"You carry more strength than you notice.",
+				"Another chance waits beyond this hour.",
+				"The wind changes for every sailor.",
+				"One step forward still counts.",
+				"Great oaks begin as tiny acorns.",
+				"The road ahead is unwritten.",
+				"Every traveler deserves a resting fire.",
+				"Even difficult chapters belong in great stories.",
+				"The future listens to persistence.",
+				"Time rewards steady hands.",
+				"A hopeful spirit endures long winters.",
+				"Your path still holds discoveries.",
+				"Not all treasure is gold.",
+				"The sky clears after enough rain.",
+				"Each day offers another beginning.",
+				"Your efforts matter more than you think.",
+				"The strongest armor is perseverance.",
+				"A good heart leaves lasting marks.",
+				"New opportunities often arrive quietly.",
+				"The next village may hold good news.",
+				"A wandering soul still finds destinations.",
+				"Even cautious progress moves mountains eventually.",
+				"Some answers require time instead of force.",
+				"The candle still burns.",
+				"Brighter days are patient travelers too.",
+				"You have not reached the end of the tale.",
+				"Even ordinary days shape extraordinary lives.",
+				"One kind word can outlast a battle.",
+				"The world changes little by little.",
+				"There is honor in continuing onward.",
+				"The minstrel believes in your journey."
+			];
+
+			const FADE_MS = 3000;
+			const GAP_MS = 2000;
+			const lyricsEl = document.getElementById('lyrics');
+
+			function shuffled(arr) {
+				const copy = arr.slice();
+				for (let i = copy.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[copy[i], copy[j]] = [copy[j], copy[i]];
+				}
+				return copy;
+			}
+
+			function readMs(text) {
+				const words = text.trim().split(/\s+/).length;
+				return Math.min(18000, Math.max(6000, words * 840));
+			}
+
+			let queue = shuffled(encouragements);
+			let cursor = 0;
+
+			function nextLine() {
+				if (cursor >= queue.length) {
+					queue = shuffled(encouragements);
+					cursor = 0;
+				}
+				return queue[cursor++];
+			}
+
+			function showNext() {
+				const line = nextLine();
+				const visibleMs = readMs(line);
+				lyricsEl.textContent = line;
+				requestAnimationFrame(() => {
+					lyricsEl.classList.add('visible');
+				});
+				setTimeout(() => {
+					lyricsEl.classList.remove('visible');
+					setTimeout(showNext, FADE_MS + GAP_MS);
+				}, FADE_MS + visibleMs);
+			}
+
+			showNext();
+		</script>
+	</body>
+</html>
